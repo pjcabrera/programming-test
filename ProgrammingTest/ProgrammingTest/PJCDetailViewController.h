@@ -8,9 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface PJCDetailViewController : UIViewController
+@interface PJCDetailViewController : UITableViewController
 
-@property (strong, nonatomic) id detailItem;
+@property (strong, nonatomic) NSObject *detailItem;
 
-@property (weak, nonatomic) IBOutlet UILabel *detailDescriptionLabel;
 @end

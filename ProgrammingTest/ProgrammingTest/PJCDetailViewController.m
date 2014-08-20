@@ -8,7 +8,9 @@
 
 #import "PJCDetailViewController.h"
 
-@interface PJCDetailViewController ()
+@interface PJCDetailViewController () {
+    NSMutableArray *_objects;
+}
 - (void)configureView;
 @end
 
@@ -29,9 +31,8 @@
 - (void)configureView
 {
     // Update the user interface for the detail item.
-
     if (self.detailItem) {
-        self.detailDescriptionLabel.text = [self.detailItem description];
+        self.title = self.detailItem.description;
     }
 }
 
@@ -46,6 +47,27 @@
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - Table View
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return 1;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return _objects.count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
+    
+    NSDate *object = _objects[indexPath.row];
+    cell.textLabel.text = [object description];
+    return cell;
 }
 
 @end
