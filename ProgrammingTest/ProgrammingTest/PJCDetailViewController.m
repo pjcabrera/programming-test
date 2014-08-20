@@ -32,7 +32,7 @@
 {
     // Update the user interface for the detail item.
     if (self.detailItem) {
-        self.title = self.detailItem.description;
+        self.title = self.detailItem.longName;
     }
 }
 

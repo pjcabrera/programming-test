@@ -8,8 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
+#import "PJCEntities.h"
+
 @interface PJCDetailViewController : UITableViewController
 
-@property (strong, nonatomic) NSObject *detailItem;
+@property (strong, nonatomic) PJCRoute *detailItem;
 
 @end
