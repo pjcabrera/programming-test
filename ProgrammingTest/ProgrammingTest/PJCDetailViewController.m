@@ -7,11 +7,10 @@
 //
 
 #import "PJCDetailViewController.h"
+#import "PJCDeparturesViewController.h"
 
-@interface PJCDetailViewController () {
-    NSMutableArray *_objects;
-}
-- (void)configureView;
+@interface PJCDetailViewController ()
+
 @end
 
 @implementation PJCDetailViewController
@@ -23,16 +22,10 @@
     if (_detailItem != newDetailItem) {
         _detailItem = newDetailItem;
         
-        // Update the view.
-        [self configureView];
-    }
-}
-
-- (void)configureView
-{
-    // Update the user interface for the detail item.
-    if (self.detailItem) {
-        self.title = self.detailItem.longName;
+        // Set the detail item on the tab bar's view controllers
+        [self.viewControllers enumerateObjectsUsingBlock:^(id<PJCDetailItemViewController> vc, NSUInteger idx, BOOL *stop) {
+            [vc setDetailItem:_detailItem];
+        }];
     }
 }
 
@@ -40,34 +33,12 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
-    [self configureView];
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
-}
-
-#pragma mark - Table View
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
-    return 1;
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
-    return _objects.count;
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
-    
-    NSDate *object = _objects[indexPath.row];
-    cell.textLabel.text = [object description];
-    return cell;
 }
 
 @end

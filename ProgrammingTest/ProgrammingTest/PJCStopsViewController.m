@@ -1,29 +1,35 @@
 //
-//  PJCMasterViewController.m
+//  PJCStopsViewController.m
 //  ProgrammingTest
 //
-//  Created by PJ Cabrera on 8/19/14.
+//  Created by PJ Cabrera on 8/20/14.
 //  Copyright (c) 2014 PJ Cabrera. All rights reserved.
 //
 
-#import "PJCMasterViewController.h"
+#import "PJCStopsViewController.h"
 
-#import "PJCDetailViewController.h"
 #import "RestKit/RestKit.h"
-#import "PJCEntities.h"
 
-@interface PJCMasterViewController () <UISearchBarDelegate>
+@interface PJCStopsViewController ()
 
-@property (nonatomic, strong) IBOutlet UISearchBar *searchBar;
-@property (nonatomic, strong) NSMutableArray *objects;
+@property (strong, nonatomic) NSMutableArray *objects;
+@property (strong, nonatomic) NSMutableArray *stops;
+@property (strong, nonatomic) IBOutlet UITableView *tableView;
 
 @end
 
-@implementation PJCMasterViewController
+@implementation PJCStopsViewController
 
-- (void)awakeFromNib
+#pragma mark - Managing the detail item
+
+- (void)setDetailItem:(id)newDetailItem
 {
-    [super awakeFromNib];
+    if (_detailItem != newDetailItem) {
+        _detailItem = newDetailItem;
+        
+        // Request the list of stops for this item
+        [self sendRouteStopsRequest:_detailItem.routeId];
+    }
 }
 
 - (void)viewDidLoad
@@ -36,16 +42,6 @@
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
-}
-
-#pragma mark - UISearchBar delegate
-
-- (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
-    [searchBar resignFirstResponder];
-}
-
-- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
-    [self sendSearchRequest:searchBar.text];
 }
 
 #pragma mark - Table view data source & delegate methods
@@ -63,41 +59,24 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
-
-    PJCRoute *route = self.objects[indexPath.row];
-    cell.textLabel.text = [route longName];
+    cell.accessoryType = UITableViewCellAccessoryNone;
+    NSDate *object = self.objects[indexPath.row];
+    cell.textLabel.text = [object description];
     return cell;
 }
 
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    [self.searchBar resignFirstResponder];
-}
+#pragma - Private methods
 
-#pragma mark - Segues
-
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
-    if ([[segue identifier] isEqualToString:@"showDetail"]) {
-        NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
-        PJCRoute *route = self.objects[indexPath.row];
-        [[segue destinationViewController] setDetailItem:route];
-    }
-}
-
-#pragma mark - Private methods
-
-- (void)sendSearchRequest:(NSString *)searchTerm {
-    
+- (void)sendRouteStopsRequest:(NSNumber *)routeId {
     //RKLogConfigureByName("*", RKLogLevelTrace);
-
+    
     // map JSON elements to object properties
-    RKObjectMapping *mapping = [RKObjectMapping mappingForClass:[PJCRoute class]];
+    RKObjectMapping *mapping = [RKObjectMapping mappingForClass:[PJCStop class]];
     [mapping addAttributeMappingsFromDictionary:@{
-        @"id"               : @"routeId",
-        @"shortName"        : @"shortName",
-        @"longName"         : @"longName",
-        @"lastModifiedDate" : @"lastModifiedDate",
-        @"agencyId"         : @"agencyId",
+        @"id"               : @"stopId",
+        @"name"             : @"name",
+        @"sequence"         : @"sequence",
+        @"route_id"         : @"routeId",
     }];
     
     // set request base URL and required headers, content type of the request, authentication
@@ -107,7 +86,7 @@
     [objectManager.HTTPClient setDefaultHeader:@"Content-Type" value:@"application/json;charset=UTF-8"];
     [objectManager.HTTPClient setAuthorizationHeaderWithUsername:@"WKD4N7YMA1uiM8V"
                                                         password:@"DtdTtzMLQlA0hk2C1Yi5pLyVIlAQ68"];
-
+    
     // the response will return the objects we're looking for in the "rows" JSON element
     NSIndexSet *statusCodes = RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful);
     RKResponseDescriptor *responseDescriptor =
@@ -121,13 +100,17 @@
     // upon success, update the table view data source & reload
     id successBlock = ^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult) {
         if (mappingResult.count) {
-            self.objects = [mappingResult array].mutableCopy;
+            id comparator = ^NSComparisonResult(PJCStop *obj1, PJCStop *obj2) {
+                return [obj1.sequence compare:obj2.sequence];
+            };
+            self.stops = [[mappingResult array] sortedArrayUsingComparator:comparator].mutableCopy;
+            self.objects = [self.stops valueForKeyPath:@"name"];
             [self.tableView reloadData];
         }
     };
     // upon failure, log the error, and display an alert view
     id failureBlock = ^(RKObjectRequestOperation *operation, NSError *error) {
-        NSLog(@"Failure requesting findRoutesByStopName: %@", error.description);
+        NSLog(@"Failure requesting findStopsByRouteId: %@", error.description);
         
         NSString *message =
         [NSString stringWithFormat:@"%@ %@", error.localizedDescription, error.localizedRecoverySuggestion];
@@ -142,13 +125,13 @@
     };
     
     // create the search request object
-    PJCSearchByStopNameRequest *request = [PJCSearchByStopNameRequest new];
-    request.params = [PJCParamStopName new];
-    request.params.stopName = [NSString stringWithFormat:@"%%%@%%", searchTerm.lowercaseString];
-
+    PJCSearchByRouteIdRequest *request = [PJCSearchByRouteIdRequest new];
+    request.params = [PJCParamRouteId new];
+    request.params.routeId = routeId;
+    
     // submit the POST request to the full URL
     [objectManager postObject:request
-                         path:@"/v1/queries/findRoutesByStopName/run"
+                         path:@"/v1/queries/findStopsByRouteId/run"
                    parameters:nil
                       success:successBlock
                       failure:failureBlock];

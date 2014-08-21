@@ -24,6 +24,10 @@
 		9D7D254A19A475F4008A845F /* ProgrammingTestTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D7D254919A475F4008A845F /* ProgrammingTestTests.m */; };
 		9D7D255819A50C03008A845F /* PJCEntities.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D7D255719A50C03008A845F /* PJCEntities.m */; };
 		9D7D255919A50C03008A845F /* PJCEntities.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D7D255719A50C03008A845F /* PJCEntities.m */; };
+		9D7D255E19A528C7008A845F /* PJCDeparturesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D7D255A19A528C7008A845F /* PJCDeparturesViewController.m */; };
+		9D7D255F19A528C7008A845F /* PJCDeparturesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D7D255A19A528C7008A845F /* PJCDeparturesViewController.m */; };
+		9D7D256019A528C7008A845F /* PJCStopsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D7D255B19A528C7008A845F /* PJCStopsViewController.m */; };
+		9D7D256119A528C7008A845F /* PJCStopsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D7D255B19A528C7008A845F /* PJCStopsViewController.m */; };
 		B24AE19B6B9B484D9961D5AF /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EE58D114A80F461F90306150 /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -62,6 +66,10 @@
 		9D7D254919A475F4008A845F /* ProgrammingTestTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ProgrammingTestTests.m; sourceTree = "<group>"; };
 		9D7D255319A4874B008A845F /* PJCEntities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PJCEntities.h; sourceTree = "<group>"; };
 		9D7D255719A50C03008A845F /* PJCEntities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PJCEntities.m; sourceTree = "<group>"; };
+		9D7D255A19A528C7008A845F /* PJCDeparturesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PJCDeparturesViewController.m; sourceTree = "<group>"; };
+		9D7D255B19A528C7008A845F /* PJCStopsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PJCStopsViewController.m; sourceTree = "<group>"; };
+		9D7D255C19A528C7008A845F /* PJCDeparturesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PJCDeparturesViewController.h; sourceTree = "<group>"; };
+		9D7D255D19A528C7008A845F /* PJCStopsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PJCStopsViewController.h; sourceTree = "<group>"; };
 		EE58D114A80F461F90306150 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -136,6 +144,10 @@
 				9D7D252219A475F4008A845F /* Supporting Files */,
 				9D7D255319A4874B008A845F /* PJCEntities.h */,
 				9D7D255719A50C03008A845F /* PJCEntities.m */,
+				9D7D255C19A528C7008A845F /* PJCDeparturesViewController.h */,
+				9D7D255A19A528C7008A845F /* PJCDeparturesViewController.m */,
+				9D7D255D19A528C7008A845F /* PJCStopsViewController.h */,
+				9D7D255B19A528C7008A845F /* PJCStopsViewController.m */,
 			);
 			path = ProgrammingTest;
 			sourceTree = "<group>";
@@ -305,7 +317,9 @@
 				9D7D252C19A475F4008A845F /* PJCAppDelegate.m in Sources */,
 				9D7D252819A475F4008A845F /* main.m in Sources */,
 				9D7D253219A475F4008A845F /* PJCMasterViewController.m in Sources */,
+				9D7D256019A528C7008A845F /* PJCStopsViewController.m in Sources */,
 				9D7D253519A475F4008A845F /* PJCDetailViewController.m in Sources */,
+				9D7D255E19A528C7008A845F /* PJCDeparturesViewController.m in Sources */,
 				9D7D255819A50C03008A845F /* PJCEntities.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -315,6 +329,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				9D7D255919A50C03008A845F /* PJCEntities.m in Sources */,
+				9D7D256119A528C7008A845F /* PJCStopsViewController.m in Sources */,
+				9D7D255F19A528C7008A845F /* PJCDeparturesViewController.m in Sources */,
 				9D7D254A19A475F4008A845F /* ProgrammingTestTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

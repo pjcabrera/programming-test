@@ -26,12 +26,36 @@
 
 @end
 
+@interface PJCSearchByRouteIdRequest : NSObject
+
+@property (nonatomic, strong) PJCParamRouteId *params;
+
+@end
+
 @interface PJCRoute : NSObject
 
-@property (nonatomic, copy) NSString *routeId;
+@property (nonatomic, copy) NSNumber *routeId;
 @property (nonatomic, copy) NSString *shortName;
 @property (nonatomic, copy) NSString *longName;
 @property (nonatomic, copy) NSDate   *lastModifiedDate;
 @property (nonatomic, copy) NSString *agencyId;
+
+@end
+
+@interface PJCStop : NSObject
+
+@property (nonatomic, copy) NSNumber *stopId;
+@property (nonatomic, copy) NSString *name;
+@property (nonatomic, copy) NSNumber *sequence;
+@property (nonatomic, copy) NSNumber *routeId;
+
+@end
+
+
+@interface PJCDeparture : NSObject
+
+@property (nonatomic, copy) NSNumber *departureId;
+@property (nonatomic, copy) NSString *calendar;
+@property (nonatomic, copy) NSString *time;
 
 @end

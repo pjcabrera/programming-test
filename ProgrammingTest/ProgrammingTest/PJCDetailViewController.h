@@ -10,7 +10,13 @@
 
 #import "PJCEntities.h"
 
-@interface PJCDetailViewController : UITableViewController
+@protocol PJCDetailItemViewController <NSObject>
+
+- (void)setDetailItem:(id)newDetailItem;
+
+@end
+
+@interface PJCDetailViewController : UITabBarController <PJCDetailItemViewController>
 
 @property (strong, nonatomic) PJCRoute *detailItem;
 

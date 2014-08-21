@@ -20,6 +20,18 @@
 
 @end
 
+@implementation PJCSearchByRouteIdRequest
+
+@end
+
 @implementation PJCRoute
+
+@end
+
+@implementation PJCStop
+
+@end
+
+@implementation PJCDeparture
 
 @end

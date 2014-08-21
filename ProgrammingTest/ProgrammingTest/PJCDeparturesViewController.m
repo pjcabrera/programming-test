@@ -1,29 +1,36 @@
 //
-//  PJCMasterViewController.m
+//  PJCDeparturesViewController.m
 //  ProgrammingTest
 //
-//  Created by PJ Cabrera on 8/19/14.
+//  Created by PJ Cabrera on 8/20/14.
 //  Copyright (c) 2014 PJ Cabrera. All rights reserved.
 //
 
-#import "PJCMasterViewController.h"
+#import "PJCDeparturesViewController.h"
 
-#import "PJCDetailViewController.h"
 #import "RestKit/RestKit.h"
-#import "PJCEntities.h"
 
-@interface PJCMasterViewController () <UISearchBarDelegate>
+@interface PJCDeparturesViewController () <UISearchBarDelegate>
 
+@property (strong, nonatomic) NSMutableArray *objects;
+@property (strong, nonatomic) NSMutableArray *departureTimes;
+@property (strong, nonatomic) IBOutlet UITableView *tableView;
 @property (nonatomic, strong) IBOutlet UISearchBar *searchBar;
-@property (nonatomic, strong) NSMutableArray *objects;
 
 @end
 
-@implementation PJCMasterViewController
+@implementation PJCDeparturesViewController
 
-- (void)awakeFromNib
+#pragma mark - Managing the detail item
+
+- (void)setDetailItem:(id)newDetailItem
 {
-    [super awakeFromNib];
+    if (_detailItem != newDetailItem) {
+        _detailItem = newDetailItem;
+        
+        // Request the list of stops for this item
+        [self sendRouteDeparturesRequest:self.detailItem.routeId];
+    }
 }
 
 - (void)viewDidLoad
@@ -36,16 +43,6 @@
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
-}
-
-#pragma mark - UISearchBar delegate
-
-- (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
-    [searchBar resignFirstResponder];
-}
-
-- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
-    [self sendSearchRequest:searchBar.text];
 }
 
 #pragma mark - Table view data source & delegate methods
@@ -63,41 +60,57 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
-
-    PJCRoute *route = self.objects[indexPath.row];
-    cell.textLabel.text = [route longName];
+    cell.accessoryType = UITableViewCellAccessoryNone;
+    NSString *time = self.objects[indexPath.row];
+    cell.textLabel.text = time;
     return cell;
 }
 
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    [self.searchBar resignFirstResponder];
+#pragma mark - UISearchBar delegate
+
+- (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar {
+    [searchBar resignFirstResponder];
 }
 
-#pragma mark - Segues
-
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
-    if ([[segue identifier] isEqualToString:@"showDetail"]) {
-        NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
-        PJCRoute *route = self.objects[indexPath.row];
-        [[segue destinationViewController] setDetailItem:route];
-    }
+- (void)searchBar:(UISearchBar *)searchBar selectedScopeButtonIndexDidChange:(NSInteger)selectedScope {
+    [self showDepartureTimes];
 }
 
 #pragma mark - Private methods
 
-- (void)sendSearchRequest:(NSString *)searchTerm {
-    
-    //RKLogConfigureByName("*", RKLogLevelTrace);
+- (void)showDepartureTimes {
+    NSString *calendarChoice;
+    switch (self.searchBar.selectedScopeButtonIndex) {
+        case 1:
+            calendarChoice = @"SATURDAY";
+            break;
+            
+        case 2:
+            calendarChoice = @"SUNDAY";
+            break;
+            
+        default:
+            calendarChoice = @"WEEKDAY";
+            break;
+    }
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"calendar == %@", calendarChoice];
+    NSMutableArray *filteredDepartureTimes = [self.departureTimes filteredArrayUsingPredicate:predicate].mutableCopy;
+    [filteredDepartureTimes sortUsingComparator:^NSComparisonResult(PJCDeparture *obj1, PJCDeparture *obj2) {
+        return [obj1.time compare:obj2.time];
+    }];
+    self.objects = [[filteredDepartureTimes valueForKeyPath:@"time"] mutableCopy];
+    [self.tableView reloadData];
+}
 
+- (void)sendRouteDeparturesRequest:(NSNumber *)routeId {
+    //RKLogConfigureByName("*", RKLogLevelTrace);
+    
     // map JSON elements to object properties
-    RKObjectMapping *mapping = [RKObjectMapping mappingForClass:[PJCRoute class]];
+    RKObjectMapping *mapping = [RKObjectMapping mappingForClass:[PJCDeparture class]];
     [mapping addAttributeMappingsFromDictionary:@{
-        @"id"               : @"routeId",
-        @"shortName"        : @"shortName",
-        @"longName"         : @"longName",
-        @"lastModifiedDate" : @"lastModifiedDate",
-        @"agencyId"         : @"agencyId",
+        @"id"               : @"departureId",
+        @"calendar"         : @"calendar",
+        @"time"             : @"time",
     }];
     
     // set request base URL and required headers, content type of the request, authentication
@@ -107,7 +120,7 @@
     [objectManager.HTTPClient setDefaultHeader:@"Content-Type" value:@"application/json;charset=UTF-8"];
     [objectManager.HTTPClient setAuthorizationHeaderWithUsername:@"WKD4N7YMA1uiM8V"
                                                         password:@"DtdTtzMLQlA0hk2C1Yi5pLyVIlAQ68"];
-
+    
     // the response will return the objects we're looking for in the "rows" JSON element
     NSIndexSet *statusCodes = RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful);
     RKResponseDescriptor *responseDescriptor =
@@ -121,13 +134,13 @@
     // upon success, update the table view data source & reload
     id successBlock = ^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult) {
         if (mappingResult.count) {
-            self.objects = [mappingResult array].mutableCopy;
-            [self.tableView reloadData];
+            self.departureTimes = [mappingResult array].mutableCopy;
+            [self showDepartureTimes];
         }
     };
     // upon failure, log the error, and display an alert view
     id failureBlock = ^(RKObjectRequestOperation *operation, NSError *error) {
-        NSLog(@"Failure requesting findRoutesByStopName: %@", error.description);
+        NSLog(@"Failure requesting findDeparturesByRouteId: %@", error.description);
         
         NSString *message =
         [NSString stringWithFormat:@"%@ %@", error.localizedDescription, error.localizedRecoverySuggestion];
@@ -142,13 +155,13 @@
     };
     
     // create the search request object
-    PJCSearchByStopNameRequest *request = [PJCSearchByStopNameRequest new];
-    request.params = [PJCParamStopName new];
-    request.params.stopName = [NSString stringWithFormat:@"%%%@%%", searchTerm.lowercaseString];
-
+    PJCSearchByRouteIdRequest *request = [PJCSearchByRouteIdRequest new];
+    request.params = [PJCParamRouteId new];
+    request.params.routeId = routeId;
+    
     // submit the POST request to the full URL
     [objectManager postObject:request
-                         path:@"/v1/queries/findRoutesByStopName/run"
+                         path:@"/v1/queries/findDeparturesByRouteId/run"
                    parameters:nil
                       success:successBlock
                       failure:failureBlock];
