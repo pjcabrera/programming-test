@@ -7,13 +7,17 @@
 //
 
 #import "PJCAppDelegate.h"
+#import "RestKit/RestKit.h"
 
 @implementation PJCAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
-    return YES;
+    
+    //RKLogConfigureByName("*", RKLogLevelTrace);
+    
+   return YES;
 }
 							
 - (void)applicationWillResignActive:(UIApplication *)application

@@ -82,8 +82,8 @@
     // set request base URL and required headers, content type of the request, authentication
     NSURL *url = [NSURL URLWithString:@"https://api.appglu.com/"];
     RKObjectManager* objectManager = [RKObjectManager managerWithBaseURL:url];
+    objectManager.requestSerializationMIMEType = RKMIMETypeJSON;
     [objectManager.HTTPClient setDefaultHeader:@"X-AppGlu-Environment" value:@"staging"];
-    [objectManager.HTTPClient setDefaultHeader:@"Content-Type" value:@"application/json;charset=UTF-8"];
     [objectManager.HTTPClient setAuthorizationHeaderWithUsername:@"WKD4N7YMA1uiM8V"
                                                         password:@"DtdTtzMLQlA0hk2C1Yi5pLyVIlAQ68"];
     
@@ -123,6 +123,24 @@
                          otherButtonTitles:nil];
         [alert show];
     };
+    
+    // map request JSON elements to object properties
+    RKObjectMapping *paramsRouteIdMapping = [RKObjectMapping requestMapping];
+    [paramsRouteIdMapping addAttributeMappingsFromArray:@[@"routeId"]];
+    
+    RKObjectMapping *requestParamsMapping = [RKObjectMapping requestMapping];
+    RKRelationshipMapping *paramsMapping =
+    [RKRelationshipMapping relationshipMappingFromKeyPath:@"params"
+                                                toKeyPath:@"params"
+                                              withMapping:paramsRouteIdMapping];
+    [requestParamsMapping addPropertyMapping:paramsMapping];
+    
+    RKRequestDescriptor *requestDescriptor =
+    [RKRequestDescriptor requestDescriptorWithMapping:requestParamsMapping
+                                          objectClass:[PJCSearchByRouteIdRequest class]
+                                          rootKeyPath:nil
+                                               method:RKRequestMethodPOST];
+    [objectManager addRequestDescriptor:requestDescriptor];
     
     // create the search request object
     PJCSearchByRouteIdRequest *request = [PJCSearchByRouteIdRequest new];
