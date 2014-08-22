@@ -122,6 +122,20 @@
             self.objects = [mappingResult array].mutableCopy;
             [self.tableView reloadData];
         }
+        else {
+            NSLog(@"findRoutesByStopName returned an empty rows array");
+            
+            NSString *message =
+            [NSString stringWithFormat:@"Search for '%@' did not return any data", searchTerm];
+            
+            UIAlertView *alert =
+            [[UIAlertView alloc] initWithTitle:@"No data"
+                                       message:message
+                                      delegate:nil
+                             cancelButtonTitle:@"OK"
+                             otherButtonTitles:nil];
+            [alert show];
+        }
     };
     // upon failure, log the error, and display an alert view
     id failureBlock = ^(RKObjectRequestOperation *operation, NSError *error) {

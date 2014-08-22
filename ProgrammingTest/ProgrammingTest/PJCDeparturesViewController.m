@@ -137,6 +137,19 @@
             self.departureTimes = [mappingResult array].mutableCopy;
             [self showDepartureTimes];
         }
+        else {
+            NSLog(@"findDeparturesByRouteId returned an empty rows array");
+            
+            NSString *message = @"Server did not return any departures";
+            
+            UIAlertView *alert =
+            [[UIAlertView alloc] initWithTitle:@"No data"
+                                       message:message
+                                      delegate:nil
+                             cancelButtonTitle:@"OK"
+                             otherButtonTitles:nil];
+            [alert show];
+        }
     };
     // upon failure, log the error, and display an alert view
     id failureBlock = ^(RKObjectRequestOperation *operation, NSError *error) {

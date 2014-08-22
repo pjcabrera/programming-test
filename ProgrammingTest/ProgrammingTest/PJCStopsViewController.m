@@ -107,6 +107,19 @@
             self.objects = [self.stops valueForKeyPath:@"name"];
             [self.tableView reloadData];
         }
+        else {
+            NSLog(@"findStopsByRouteId returned an empty rows array");
+            
+            NSString *message = @"Server did not return any stops";
+            
+            UIAlertView *alert =
+            [[UIAlertView alloc] initWithTitle:@"No data"
+                                       message:message
+                                      delegate:nil
+                             cancelButtonTitle:@"OK"
+                             otherButtonTitles:nil];
+            [alert show];
+        }
     };
     // upon failure, log the error, and display an alert view
     id failureBlock = ^(RKObjectRequestOperation *operation, NSError *error) {
